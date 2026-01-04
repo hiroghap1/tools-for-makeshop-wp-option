@@ -215,3 +215,55 @@ msgstr "説明セレクタ"
 #: tools-for-makeshop-wp-option.php:380
 msgid "Default:"
 msgstr "デフォルト:"
+
+#: tools-for-makeshop-wp-option.php:253
+msgid "Display Product Image"
+msgstr "商品画像を表示"
+
+#: tools-for-makeshop-wp-option.php:385
+msgid "Show product images"
+msgstr "商品画像を表示する"
+
+#: tools-for-makeshop-wp-option.php:261
+msgid "Display Category"
+msgstr "カテゴリを表示"
+
+#: tools-for-makeshop-wp-option.php:398
+msgid "Show product categories"
+msgstr "商品カテゴリを表示する"
+
+#: tools-for-makeshop-wp-option.php:269
+msgid "Display Price"
+msgstr "価格を表示"
+
+#: tools-for-makeshop-wp-option.php:411
+msgid "Show product prices"
+msgstr "商品価格を表示する"
+
+#: tools-for-makeshop-wp-option.php:277
+msgid "Display Description"
+msgstr "説明を表示"
+
+#: tools-for-makeshop-wp-option.php:424
+msgid "Show product descriptions"
+msgstr "商品説明を表示する"
+
+#: tools-for-makeshop-wp-option.php:306
+msgid "Product Name Line Limit"
+msgstr "商品名の行数制限"
+
+#: tools-for-makeshop-wp-option.php:474
+msgid "Number of lines to display for product name. Set to 0 for no limit."
+msgstr "商品名の表示行数。0に設定すると制限なし。"
+
+#: tools-for-makeshop-wp-option.php:314
+msgid "Description Line Limit"
+msgstr "説明の行数制限"
+
+#: tools-for-makeshop-wp-option.php:487
+msgid "Number of lines to display for product description. Set to 0 for no limit."
+msgstr "商品説明の表示行数。0に設定すると制限なし。"
+
+#: tools-for-makeshop-wp-option.php:396
+msgid "Configure product display block settings. CSS selectors are used to retrieve product information from makeshop sites."
+msgstr "商品表示ブロックの設定を構成します。CSSセレクタはmakeshopサイトから商品情報を取得するために使用されます。"

@@ -191,6 +191,27 @@ class TFMWP_Block_Product_Display {
 			return '<p>' . esc_html__( 'No products found.', 'tools-for-makeshop-wp-option' ) . '</p>';
 		}
 
+		// Get display settings.
+		$display_image       = get_option( 'tfmwp_display_image', true );
+		$display_category    = get_option( 'tfmwp_display_category', true );
+		$display_price       = get_option( 'tfmwp_display_price', true );
+		$display_description = get_option( 'tfmwp_display_description', true );
+
+		// Get line clamp settings.
+		$name_line_clamp        = intval( get_option( 'tfmwp_name_line_clamp', 0 ) );
+		$description_line_clamp = intval( get_option( 'tfmwp_description_line_clamp', 0 ) );
+
+		// Build inline styles for line clamp.
+		$name_style = '';
+		if ( $name_line_clamp > 0 ) {
+			$name_style = 'display: -webkit-box; -webkit-line-clamp: ' . $name_line_clamp . '; -webkit-box-orient: vertical; overflow: hidden;';
+		}
+
+		$description_style = '';
+		if ( $description_line_clamp > 0 ) {
+			$description_style = 'display: -webkit-box; -webkit-line-clamp: ' . $description_line_clamp . '; -webkit-box-orient: vertical; overflow: hidden;';
+		}
+
 		// Build HTML output.
 		ob_start();
 		?>
@@ -204,23 +225,23 @@ class TFMWP_Block_Product_Display {
 				?>
 				<div class="tfmwp-product-item">
 					<a href="<?php echo esc_url( $product['url'] ); ?>" class="tfmwp-product-link" target="_blank" rel="noopener">
-						<?php if ( ! empty( $product['image'] ) ) : ?>
+						<?php if ( $display_image && ! empty( $product['image'] ) ) : ?>
 							<div class="tfmwp-product-image">
 								<img src="<?php echo esc_url( $product['image'] ); ?>" alt="<?php echo esc_attr( $product['name'] ); ?>" loading="lazy">
 							</div>
 						<?php endif; ?>
 						<div class="tfmwp-product-info">
-							<?php if ( ! empty( $product['category'] ) ) : ?>
+							<?php if ( $display_category && ! empty( $product['category'] ) ) : ?>
 								<div class="tfmwp-product-category"><?php echo esc_html( $product['category'] ); ?></div>
 							<?php endif; ?>
 							<?php if ( ! empty( $product['name'] ) ) : ?>
-								<h3 class="tfmwp-product-name"><?php echo esc_html( $product['name'] ); ?></h3>
+								<h3 class="tfmwp-product-name"<?php echo ! empty( $name_style ) ? ' style="' . esc_attr( $name_style ) . '"' : ''; ?>><?php echo esc_html( $product['name'] ); ?></h3>
 							<?php endif; ?>
-							<?php if ( ! empty( $product['price'] ) ) : ?>
+							<?php if ( $display_price && ! empty( $product['price'] ) ) : ?>
 								<div class="tfmwp-product-price"><?php echo esc_html( $product['price'] ); ?></div>
 							<?php endif; ?>
-							<?php if ( ! empty( $product['description'] ) ) : ?>
-								<p class="tfmwp-product-description"><?php echo esc_html( wp_trim_words( $product['description'], 20 ) ); ?></p>
+							<?php if ( $display_description && ! empty( $product['description'] ) ) : ?>
+								<p class="tfmwp-product-description"<?php echo ! empty( $description_style ) ? ' style="' . esc_attr( $description_style ) . '"' : ''; ?>><?php echo esc_html( $product['description'] ); ?></p>
 							<?php endif; ?>
 						</div>
 					</a>

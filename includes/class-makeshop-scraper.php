@@ -193,8 +193,13 @@ class TFMWP_Makeshop_Scraper {
 		// Suppress warnings from DOMDocument.
 		libxml_use_internal_errors( true );
 
+		// Add UTF-8 meta tag if not present to ensure proper encoding.
+		if ( stripos( $html, 'charset' ) === false ) {
+			$html = '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">' . $html;
+		}
+
 		$dom = new DOMDocument();
-		$dom->loadHTML( mb_convert_encoding( $html, 'HTML-ENTITIES', 'UTF-8' ) );
+		$dom->loadHTML( $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
 
 		libxml_clear_errors();
 
@@ -248,10 +253,26 @@ class TFMWP_Makeshop_Scraper {
 			$product['name'] = trim( $name_nodes->item( 0 )->nodeValue );
 		}
 
+		// Fallback: Try to get any h1 if no name found.
+		if ( empty( $product['name'] ) ) {
+			$h1_nodes = $xpath->query( '//h1' );
+			if ( $h1_nodes && $h1_nodes->length > 0 ) {
+				$product['name'] = trim( $h1_nodes->item( 0 )->nodeValue );
+			}
+		}
+
 		// Extract product image.
 		$image_nodes = $xpath->query( $selector_image );
 		if ( $image_nodes && $image_nodes->length > 0 ) {
 			$product['image'] = trim( $image_nodes->item( 0 )->nodeValue );
+		}
+
+		// Fallback: Try to get the first img src if no image found.
+		if ( empty( $product['image'] ) ) {
+			$img_nodes = $xpath->query( '//img[@src]/@src' );
+			if ( $img_nodes && $img_nodes->length > 0 ) {
+				$product['image'] = trim( $img_nodes->item( 0 )->nodeValue );
+			}
 		}
 
 		// Extract category.

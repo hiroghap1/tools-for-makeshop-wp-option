@@ -126,6 +126,68 @@ function tfmwp_register_settings() {
 		)
 	);
 
+	// Register product display field settings.
+	register_setting(
+		'tfmwp_settings_group',
+		'tfmwp_display_image',
+		array(
+			'type'              => 'boolean',
+			'default'           => true,
+			'sanitize_callback' => 'tfmwp_sanitize_checkbox',
+		)
+	);
+
+	register_setting(
+		'tfmwp_settings_group',
+		'tfmwp_display_category',
+		array(
+			'type'              => 'boolean',
+			'default'           => true,
+			'sanitize_callback' => 'tfmwp_sanitize_checkbox',
+		)
+	);
+
+	register_setting(
+		'tfmwp_settings_group',
+		'tfmwp_display_price',
+		array(
+			'type'              => 'boolean',
+			'default'           => true,
+			'sanitize_callback' => 'tfmwp_sanitize_checkbox',
+		)
+	);
+
+	register_setting(
+		'tfmwp_settings_group',
+		'tfmwp_display_description',
+		array(
+			'type'              => 'boolean',
+			'default'           => true,
+			'sanitize_callback' => 'tfmwp_sanitize_checkbox',
+		)
+	);
+
+	// Register line clamp settings.
+	register_setting(
+		'tfmwp_settings_group',
+		'tfmwp_name_line_clamp',
+		array(
+			'type'              => 'integer',
+			'default'           => 0,
+			'sanitize_callback' => 'absint',
+		)
+	);
+
+	register_setting(
+		'tfmwp_settings_group',
+		'tfmwp_description_line_clamp',
+		array(
+			'type'              => 'integer',
+			'default'           => 0,
+			'sanitize_callback' => 'absint',
+		)
+	);
+
 	// Register selector settings.
 	register_setting(
 		'tfmwp_settings_group',
@@ -207,52 +269,97 @@ function tfmwp_register_settings() {
 		'tfmwp_block_section'
 	);
 
-	// Add selector settings section.
-	add_settings_section(
-		'tfmwp_selector_section',
-		__( 'Product Information Selectors', 'tools-for-makeshop-wp-option' ),
-		'tfmwp_selector_section_callback',
-		'tfmwp-settings'
-	);
-
+	// Product Name Settings (always displayed).
 	add_settings_field(
 		'tfmwp_selector_name',
 		__( 'Product Name Selector', 'tools-for-makeshop-wp-option' ),
 		'tfmwp_selector_name_callback',
 		'tfmwp-settings',
-		'tfmwp_selector_section'
+		'tfmwp_block_section'
 	);
 
+	add_settings_field(
+		'tfmwp_name_line_clamp',
+		__( 'Product Name Line Limit', 'tools-for-makeshop-wp-option' ),
+		'tfmwp_name_line_clamp_callback',
+		'tfmwp-settings',
+		'tfmwp_block_section'
+	);
+
+	// Product Image Settings.
 	add_settings_field(
 		'tfmwp_selector_image',
 		__( 'Product Image Selector', 'tools-for-makeshop-wp-option' ),
 		'tfmwp_selector_image_callback',
 		'tfmwp-settings',
-		'tfmwp_selector_section'
+		'tfmwp_block_section'
 	);
 
+	add_settings_field(
+		'tfmwp_display_image',
+		__( 'Display Product Image', 'tools-for-makeshop-wp-option' ),
+		'tfmwp_display_image_callback',
+		'tfmwp-settings',
+		'tfmwp_block_section'
+	);
+
+	// Category Settings.
 	add_settings_field(
 		'tfmwp_selector_category',
 		__( 'Category Selector', 'tools-for-makeshop-wp-option' ),
 		'tfmwp_selector_category_callback',
 		'tfmwp-settings',
-		'tfmwp_selector_section'
+		'tfmwp_block_section'
 	);
 
+	add_settings_field(
+		'tfmwp_display_category',
+		__( 'Display Category', 'tools-for-makeshop-wp-option' ),
+		'tfmwp_display_category_callback',
+		'tfmwp-settings',
+		'tfmwp_block_section'
+	);
+
+	// Price Settings.
 	add_settings_field(
 		'tfmwp_selector_price',
 		__( 'Price Selector', 'tools-for-makeshop-wp-option' ),
 		'tfmwp_selector_price_callback',
 		'tfmwp-settings',
-		'tfmwp_selector_section'
+		'tfmwp_block_section'
 	);
 
+	add_settings_field(
+		'tfmwp_display_price',
+		__( 'Display Price', 'tools-for-makeshop-wp-option' ),
+		'tfmwp_display_price_callback',
+		'tfmwp-settings',
+		'tfmwp_block_section'
+	);
+
+	// Description Settings.
 	add_settings_field(
 		'tfmwp_selector_description',
 		__( 'Description Selector', 'tools-for-makeshop-wp-option' ),
 		'tfmwp_selector_description_callback',
 		'tfmwp-settings',
-		'tfmwp_selector_section'
+		'tfmwp_block_section'
+	);
+
+	add_settings_field(
+		'tfmwp_display_description',
+		__( 'Display Description', 'tools-for-makeshop-wp-option' ),
+		'tfmwp_display_description_callback',
+		'tfmwp-settings',
+		'tfmwp_block_section'
+	);
+
+	add_settings_field(
+		'tfmwp_description_line_clamp',
+		__( 'Description Line Limit', 'tools-for-makeshop-wp-option' ),
+		'tfmwp_description_line_clamp_callback',
+		'tfmwp-settings',
+		'tfmwp_block_section'
 	);
 }
 
@@ -285,7 +392,18 @@ function tfmwp_enable_preview_callback() {
  * Render block section callback.
  */
 function tfmwp_block_section_callback() {
-	// HR is now after preview settings table
+	?>
+	<p><?php esc_html_e( 'Configure product display block settings. CSS selectors are used to retrieve product information from makeshop sites.', 'tools-for-makeshop-wp-option' ); ?></p>
+	<p><strong><?php esc_html_e( 'CSS Selector Examples:', 'tools-for-makeshop-wp-option' ); ?></strong></p>
+	<ul style="list-style-type: disc; margin-left: 20px;">
+		<li><code>h1.product-title</code> - <?php esc_html_e( 'Element with class', 'tools-for-makeshop-wp-option' ); ?></li>
+		<li><code>.price</code> - <?php esc_html_e( 'Any element with class', 'tools-for-makeshop-wp-option' ); ?></li>
+		<li><code>#product-name</code> - <?php esc_html_e( 'Element with ID', 'tools-for-makeshop-wp-option' ); ?></li>
+		<li><code>meta[property=og:image]::attr(content)</code> - <?php esc_html_e( 'Get attribute value', 'tools-for-makeshop-wp-option' ); ?></li>
+		<li><code>.price, .product-price</code> - <?php esc_html_e( 'Multiple selectors (OR)', 'tools-for-makeshop-wp-option' ); ?></li>
+		<li><code>div.product img::attr(src)</code> - <?php esc_html_e( 'Nested elements', 'tools-for-makeshop-wp-option' ); ?></li>
+	</ul>
+	<?php
 }
 
 /**
@@ -298,6 +416,84 @@ function tfmwp_enable_product_block_callback() {
 		<input type="checkbox" name="tfmwp_enable_product_block" value="1" <?php checked( $enabled, true ); ?> />
 		<?php esc_html_e( 'Enable makeshop product display block in the block editor', 'tools-for-makeshop-wp-option' ); ?>
 	</label>
+	<?php
+}
+
+/**
+ * Render display image field.
+ */
+function tfmwp_display_image_callback() {
+	$enabled = get_option( 'tfmwp_display_image', true );
+	?>
+	<label>
+		<input type="checkbox" name="tfmwp_display_image" value="1" <?php checked( $enabled, true ); ?> />
+		<?php esc_html_e( 'Show product images', 'tools-for-makeshop-wp-option' ); ?>
+	</label>
+	<?php
+}
+
+/**
+ * Render display category field.
+ */
+function tfmwp_display_category_callback() {
+	$enabled = get_option( 'tfmwp_display_category', true );
+	?>
+	<label>
+		<input type="checkbox" name="tfmwp_display_category" value="1" <?php checked( $enabled, true ); ?> />
+		<?php esc_html_e( 'Show product categories', 'tools-for-makeshop-wp-option' ); ?>
+	</label>
+	<?php
+}
+
+/**
+ * Render display price field.
+ */
+function tfmwp_display_price_callback() {
+	$enabled = get_option( 'tfmwp_display_price', true );
+	?>
+	<label>
+		<input type="checkbox" name="tfmwp_display_price" value="1" <?php checked( $enabled, true ); ?> />
+		<?php esc_html_e( 'Show product prices', 'tools-for-makeshop-wp-option' ); ?>
+	</label>
+	<?php
+}
+
+/**
+ * Render display description field.
+ */
+function tfmwp_display_description_callback() {
+	$enabled = get_option( 'tfmwp_display_description', true );
+	?>
+	<label>
+		<input type="checkbox" name="tfmwp_display_description" value="1" <?php checked( $enabled, true ); ?> />
+		<?php esc_html_e( 'Show product descriptions', 'tools-for-makeshop-wp-option' ); ?>
+	</label>
+	<?php
+}
+
+/**
+ * Render name line clamp field.
+ */
+function tfmwp_name_line_clamp_callback() {
+	$value = get_option( 'tfmwp_name_line_clamp', 0 );
+	?>
+	<input type="number" name="tfmwp_name_line_clamp" value="<?php echo esc_attr( $value ); ?>" min="0" max="10" step="1" style="width: 80px;" />
+	<p class="description">
+		<?php esc_html_e( 'Number of lines to display for product name. Set to 0 for no limit.', 'tools-for-makeshop-wp-option' ); ?>
+	</p>
+	<?php
+}
+
+/**
+ * Render description line clamp field.
+ */
+function tfmwp_description_line_clamp_callback() {
+	$value = get_option( 'tfmwp_description_line_clamp', 0 );
+	?>
+	<input type="number" name="tfmwp_description_line_clamp" value="<?php echo esc_attr( $value ); ?>" min="0" max="10" step="1" style="width: 80px;" />
+	<p class="description">
+		<?php esc_html_e( 'Number of lines to display for product description. Set to 0 for no limit.', 'tools-for-makeshop-wp-option' ); ?>
+	</p>
 	<?php
 }
 
