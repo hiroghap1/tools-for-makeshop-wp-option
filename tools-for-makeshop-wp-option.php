@@ -126,6 +126,57 @@ function tfmwp_register_settings() {
 		)
 	);
 
+	// Register selector settings.
+	register_setting(
+		'tfmwp_settings_group',
+		'tfmwp_selector_name',
+		array(
+			'type'              => 'string',
+			'default'           => '',
+			'sanitize_callback' => 'sanitize_text_field',
+		)
+	);
+
+	register_setting(
+		'tfmwp_settings_group',
+		'tfmwp_selector_image',
+		array(
+			'type'              => 'string',
+			'default'           => '',
+			'sanitize_callback' => 'sanitize_text_field',
+		)
+	);
+
+	register_setting(
+		'tfmwp_settings_group',
+		'tfmwp_selector_category',
+		array(
+			'type'              => 'string',
+			'default'           => '',
+			'sanitize_callback' => 'sanitize_text_field',
+		)
+	);
+
+	register_setting(
+		'tfmwp_settings_group',
+		'tfmwp_selector_price',
+		array(
+			'type'              => 'string',
+			'default'           => '',
+			'sanitize_callback' => 'sanitize_text_field',
+		)
+	);
+
+	register_setting(
+		'tfmwp_settings_group',
+		'tfmwp_selector_description',
+		array(
+			'type'              => 'string',
+			'default'           => '',
+			'sanitize_callback' => 'sanitize_text_field',
+		)
+	);
+
 	add_settings_section(
 		'tfmwp_main_section',
 		__( 'Preview Settings', 'tools-for-makeshop-wp-option' ),
@@ -144,7 +195,7 @@ function tfmwp_register_settings() {
 	add_settings_section(
 		'tfmwp_block_section',
 		__( 'Block Settings', 'tools-for-makeshop-wp-option' ),
-		null,
+		'tfmwp_block_section_callback',
 		'tfmwp-settings'
 	);
 
@@ -154,6 +205,54 @@ function tfmwp_register_settings() {
 		'tfmwp_enable_product_block_callback',
 		'tfmwp-settings',
 		'tfmwp_block_section'
+	);
+
+	// Add selector settings section.
+	add_settings_section(
+		'tfmwp_selector_section',
+		__( 'Product Information Selectors', 'tools-for-makeshop-wp-option' ),
+		'tfmwp_selector_section_callback',
+		'tfmwp-settings'
+	);
+
+	add_settings_field(
+		'tfmwp_selector_name',
+		__( 'Product Name Selector', 'tools-for-makeshop-wp-option' ),
+		'tfmwp_selector_name_callback',
+		'tfmwp-settings',
+		'tfmwp_selector_section'
+	);
+
+	add_settings_field(
+		'tfmwp_selector_image',
+		__( 'Product Image Selector', 'tools-for-makeshop-wp-option' ),
+		'tfmwp_selector_image_callback',
+		'tfmwp-settings',
+		'tfmwp_selector_section'
+	);
+
+	add_settings_field(
+		'tfmwp_selector_category',
+		__( 'Category Selector', 'tools-for-makeshop-wp-option' ),
+		'tfmwp_selector_category_callback',
+		'tfmwp-settings',
+		'tfmwp_selector_section'
+	);
+
+	add_settings_field(
+		'tfmwp_selector_price',
+		__( 'Price Selector', 'tools-for-makeshop-wp-option' ),
+		'tfmwp_selector_price_callback',
+		'tfmwp-settings',
+		'tfmwp_selector_section'
+	);
+
+	add_settings_field(
+		'tfmwp_selector_description',
+		__( 'Description Selector', 'tools-for-makeshop-wp-option' ),
+		'tfmwp_selector_description_callback',
+		'tfmwp-settings',
+		'tfmwp_selector_section'
 	);
 }
 
@@ -177,7 +276,16 @@ function tfmwp_enable_preview_callback() {
 		<input type="checkbox" name="tfmwp_enable_preview" value="1" <?php checked( $enabled, true ); ?> />
 		<?php esc_html_e( 'Enable block editor preview and save functionality on WordPress integration option', 'tools-for-makeshop-wp-option' ); ?>
 	</label>
+	</td></tr></tbody></table>
+	<hr style="margin: 20px 0; border: 0; border-top: 1px solid #ccc;">
 	<?php
+}
+
+/**
+ * Render block section callback.
+ */
+function tfmwp_block_section_callback() {
+	// HR is now after preview settings table
 }
 
 /**
@@ -190,6 +298,99 @@ function tfmwp_enable_product_block_callback() {
 		<input type="checkbox" name="tfmwp_enable_product_block" value="1" <?php checked( $enabled, true ); ?> />
 		<?php esc_html_e( 'Enable makeshop product display block in the block editor', 'tools-for-makeshop-wp-option' ); ?>
 	</label>
+	<?php
+}
+
+/**
+ * Render selector section description.
+ */
+function tfmwp_selector_section_callback() {
+	?>
+	<p><?php esc_html_e( 'Configure custom CSS selectors for retrieving product information from makeshop sites. Leave empty to use default selectors.', 'tools-for-makeshop-wp-option' ); ?></p>
+	<p><strong><?php esc_html_e( 'CSS Selector Examples:', 'tools-for-makeshop-wp-option' ); ?></strong></p>
+	<ul style="list-style-type: disc; margin-left: 20px;">
+		<li><code>h1.product-title</code> - <?php esc_html_e( 'Element with class', 'tools-for-makeshop-wp-option' ); ?></li>
+		<li><code>.price</code> - <?php esc_html_e( 'Any element with class', 'tools-for-makeshop-wp-option' ); ?></li>
+		<li><code>#product-name</code> - <?php esc_html_e( 'Element with ID', 'tools-for-makeshop-wp-option' ); ?></li>
+		<li><code>meta[property=og:image]::attr(content)</code> - <?php esc_html_e( 'Get attribute value', 'tools-for-makeshop-wp-option' ); ?></li>
+		<li><code>.price, .product-price</code> - <?php esc_html_e( 'Multiple selectors (OR)', 'tools-for-makeshop-wp-option' ); ?></li>
+		<li><code>div.product img::attr(src)</code> - <?php esc_html_e( 'Nested elements', 'tools-for-makeshop-wp-option' ); ?></li>
+	</ul>
+	<?php
+}
+
+/**
+ * Render product name selector field.
+ */
+function tfmwp_selector_name_callback() {
+	$value = get_option( 'tfmwp_selector_name', '' );
+	$default = 'h1.item_name, h1.product-name, meta[property=og:title]::attr(content)';
+	?>
+	<input type="text" name="tfmwp_selector_name" value="<?php echo esc_attr( $value ); ?>" class="large-text" placeholder="<?php echo esc_attr( $default ); ?>" />
+	<p class="description">
+		<?php esc_html_e( 'Default:', 'tools-for-makeshop-wp-option' ); ?>
+		<code><?php echo esc_html( $default ); ?></code>
+	</p>
+	<?php
+}
+
+/**
+ * Render product image selector field.
+ */
+function tfmwp_selector_image_callback() {
+	$value = get_option( 'tfmwp_selector_image', '' );
+	$default = 'meta[property=og:image]::attr(content), .product-image img::attr(src), img.item_image::attr(src)';
+	?>
+	<input type="text" name="tfmwp_selector_image" value="<?php echo esc_attr( $value ); ?>" class="large-text" placeholder="<?php echo esc_attr( $default ); ?>" />
+	<p class="description">
+		<?php esc_html_e( 'Default:', 'tools-for-makeshop-wp-option' ); ?>
+		<code><?php echo esc_html( $default ); ?></code>
+	</p>
+	<?php
+}
+
+/**
+ * Render category selector field.
+ */
+function tfmwp_selector_category_callback() {
+	$value = get_option( 'tfmwp_selector_category', '' );
+	$default = '.breadcrumb a, .category';
+	?>
+	<input type="text" name="tfmwp_selector_category" value="<?php echo esc_attr( $value ); ?>" class="large-text" placeholder="<?php echo esc_attr( $default ); ?>" />
+	<p class="description">
+		<?php esc_html_e( 'Default:', 'tools-for-makeshop-wp-option' ); ?>
+		<code><?php echo esc_html( $default ); ?></code>
+	</p>
+	<?php
+}
+
+/**
+ * Render price selector field.
+ */
+function tfmwp_selector_price_callback() {
+	$value = get_option( 'tfmwp_selector_price', '' );
+	$default = '.price, meta[property=product:price:amount]::attr(content)';
+	?>
+	<input type="text" name="tfmwp_selector_price" value="<?php echo esc_attr( $value ); ?>" class="large-text" placeholder="<?php echo esc_attr( $default ); ?>" />
+	<p class="description">
+		<?php esc_html_e( 'Default:', 'tools-for-makeshop-wp-option' ); ?>
+		<code><?php echo esc_html( $default ); ?></code>
+	</p>
+	<?php
+}
+
+/**
+ * Render description selector field.
+ */
+function tfmwp_selector_description_callback() {
+	$value = get_option( 'tfmwp_selector_description', '' );
+	$default = 'meta[property=og:description]::attr(content), meta[name=description]::attr(content)';
+	?>
+	<input type="text" name="tfmwp_selector_description" value="<?php echo esc_attr( $value ); ?>" class="large-text" placeholder="<?php echo esc_attr( $default ); ?>" />
+	<p class="description">
+		<?php esc_html_e( 'Default:', 'tools-for-makeshop-wp-option' ); ?>
+		<code><?php echo esc_html( $default ); ?></code>
+	</p>
 	<?php
 }
 

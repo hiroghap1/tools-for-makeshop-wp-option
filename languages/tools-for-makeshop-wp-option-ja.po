@@ -108,15 +108,31 @@ msgstr "モバイル列数"
 msgid "Cache Control"
 msgstr "キャッシュ制御"
 
-#: blocks/product-display/block.js:85
-msgid "Product information is cached for 1 hour. Click the button below to refresh."
-msgstr "商品情報は1時間キャッシュされます。下のボタンをクリックして更新してください。"
+#: src/index.js:109
+msgid "Click the button below to refresh product data."
+msgstr "下のボタンをクリックして商品データを更新してください。"
 
-#: blocks/product-display/block.js:89
+#: src/index.js:115
 msgid "Refresh Product Data"
 msgstr "商品データを更新"
 
-#: blocks/product-display/block.js:100
+#: src/index.js:119
+msgid "Last updated:"
+msgstr "最終更新:"
+
+#: src/index.js:130
+msgid "Loading products..."
+msgstr "商品を読み込み中..."
+
+#: src/index.js:135
+msgid "Error loading products:"
+msgstr "商品の読み込みエラー:"
+
+#: src/index.js:187
+msgid "Enter valid product URLs to see preview."
+msgstr "有効な商品URLを入力してプレビューを表示してください。"
+
+#: src/index.js:192
 msgid "Enter product URLs in the sidebar to display products."
 msgstr "商品を表示するには、サイドバーに商品URLを入力してください。"
 
@@ -135,3 +151,67 @@ msgstr "ページから商品情報の解析に失敗しました。"
 #: includes/class-block-product-display.php:114
 msgid "No products found."
 msgstr "商品が見つかりませんでした。"
+
+#: tools-for-makeshop-wp-option.php:213
+msgid "Product Information Selectors"
+msgstr "商品情報セレクタ"
+
+#: tools-for-makeshop-wp-option.php:300
+msgid "Configure custom CSS selectors for retrieving product information from makeshop sites. Leave empty to use default selectors."
+msgstr "makeshopサイトから商品情報を取得するためのカスタムCSSセレクタを設定します。空欄のままにするとデフォルトのセレクタが使用されます。"
+
+#: tools-for-makeshop-wp-option.php:301
+msgid "CSS Selector Examples:"
+msgstr "CSSセレクタの例:"
+
+#: tools-for-makeshop-wp-option.php:303
+msgid "Element with class"
+msgstr "classを持つ要素"
+
+#: tools-for-makeshop-wp-option.php:304
+msgid "Any element with class"
+msgstr "classを持つ任意の要素"
+
+#: tools-for-makeshop-wp-option.php:305
+msgid "Element with ID"
+msgstr "IDを持つ要素"
+
+#: tools-for-makeshop-wp-option.php:306
+msgid "Get attribute value"
+msgstr "属性値を取得"
+
+#: tools-for-makeshop-wp-option.php:307
+msgid "Multiple selectors (OR)"
+msgstr "複数のセレクタ（OR）"
+
+#: tools-for-makeshop-wp-option.php:308
+msgid "Nested elements"
+msgstr "入れ子の要素"
+
+#: tools-for-makeshop-wp-option.php:220
+msgid "Product Name Selector"
+msgstr "商品名セレクタ"
+
+#: tools-for-makeshop-wp-option.php:228
+msgid "Product Image Selector"
+msgstr "商品画像セレクタ"
+
+#: tools-for-makeshop-wp-option.php:236
+msgid "Category Selector"
+msgstr "カテゴリセレクタ"
+
+#: tools-for-makeshop-wp-option.php:244
+msgid "Price Selector"
+msgstr "価格セレクタ"
+
+#: tools-for-makeshop-wp-option.php:252
+msgid "Description Selector"
+msgstr "説明セレクタ"
+
+#: tools-for-makeshop-wp-option.php:320
+#: tools-for-makeshop-wp-option.php:335
+#: tools-for-makeshop-wp-option.php:350
+#: tools-for-makeshop-wp-option.php:365
+#: tools-for-makeshop-wp-option.php:380
+msgid "Default:"
+msgstr "デフォルト:"

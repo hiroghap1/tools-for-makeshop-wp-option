@@ -150,10 +150,12 @@ class TFMWP_Block_Product_Display {
 	 * @return string Block HTML.
 	 */
 	public static function render_block( $attributes ) {
-		$product_urls = isset( $attributes['productUrls'] ) ? $attributes['productUrls'] : '';
+		$product_urls    = isset( $attributes['productUrls'] ) ? $attributes['productUrls'] : '';
+		$products_data   = isset( $attributes['productsData'] ) ? $attributes['productsData'] : array();
+		$last_fetched    = isset( $attributes['lastFetched'] ) ? intval( $attributes['lastFetched'] ) : 0;
 		$columns_desktop = isset( $attributes['columnsDesktop'] ) ? intval( $attributes['columnsDesktop'] ) : 4;
-		$columns_tablet = isset( $attributes['columnsTablet'] ) ? intval( $attributes['columnsTablet'] ) : 3;
-		$columns_mobile = isset( $attributes['columnsMobile'] ) ? intval( $attributes['columnsMobile'] ) : 2;
+		$columns_tablet  = isset( $attributes['columnsTablet'] ) ? intval( $attributes['columnsTablet'] ) : 3;
+		$columns_mobile  = isset( $attributes['columnsMobile'] ) ? intval( $attributes['columnsMobile'] ) : 2;
 
 		if ( empty( $product_urls ) ) {
 			return '';
@@ -166,12 +168,22 @@ class TFMWP_Block_Product_Display {
 			return '';
 		}
 
-		// Fetch product information for each URL.
-		$products = array();
-		foreach ( $urls as $url ) {
-			$product = TFMWP_Makeshop_Scraper::fetch_product( $url );
-			if ( ! is_wp_error( $product ) ) {
-				$products[] = $product;
+		// Check if data is older than 1 hour (3600 seconds).
+		$one_hour_ago = time() - 3600;
+		$is_data_stale = ( $last_fetched < $one_hour_ago );
+
+		// Use saved data if fresh, otherwise re-fetch.
+		if ( ! empty( $products_data ) && ! $is_data_stale ) {
+			// Use saved products data (fresh data).
+			$products = $products_data;
+		} else {
+			// Data is stale or missing, fetch fresh product information.
+			$products = array();
+			foreach ( $urls as $url ) {
+				$product = TFMWP_Makeshop_Scraper::fetch_product( $url );
+				if ( ! is_wp_error( $product ) ) {
+					$products[] = $product;
+				}
 			}
 		}
 
@@ -184,6 +196,12 @@ class TFMWP_Block_Product_Display {
 		?>
 		<div class="tfmwp-product-grid" data-columns-desktop="<?php echo esc_attr( $columns_desktop ); ?>" data-columns-tablet="<?php echo esc_attr( $columns_tablet ); ?>" data-columns-mobile="<?php echo esc_attr( $columns_mobile ); ?>">
 			<?php foreach ( $products as $product ) : ?>
+				<?php
+				// Skip products with errors.
+				if ( isset( $product['error'] ) ) {
+					continue;
+				}
+				?>
 				<div class="tfmwp-product-item">
 					<a href="<?php echo esc_url( $product['url'] ); ?>" class="tfmwp-product-link" target="_blank" rel="noopener">
 						<?php if ( ! empty( $product['image'] ) ) : ?>

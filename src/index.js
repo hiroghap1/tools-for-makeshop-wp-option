@@ -1,7 +1,9 @@
 import { registerBlockType } from '@wordpress/blocks';
-import { TextareaControl, PanelBody, RangeControl, Button } from '@wordpress/components';
+import { TextareaControl, PanelBody, RangeControl, Button, Spinner } from '@wordpress/components';
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
+import { useState, useEffect } from '@wordpress/element';
+import apiFetch from '@wordpress/api-fetch';
 import './editor.scss';
 import './style.scss';
 import metadata from './block.json';
@@ -10,15 +12,56 @@ registerBlockType(metadata.name, {
 	...metadata,
 
 	edit: ({ attributes, setAttributes }) => {
-		const { productUrls, columnsDesktop, columnsTablet, columnsMobile } = attributes;
+		const { productUrls, productsData, lastFetched, columnsDesktop, columnsTablet, columnsMobile } = attributes;
 		const blockProps = useBlockProps();
+		const [isLoading, setIsLoading] = useState(false);
+		const [fetchError, setFetchError] = useState(null);
+
+		// Fetch products when URLs change
+		useEffect(() => {
+			const urlList = productUrls ? productUrls.split('\n').filter(url => url.trim() !== '') : [];
+
+			if (urlList.length === 0) {
+				setAttributes({ productsData: [], lastFetched: 0 });
+				return;
+			}
+
+			// Debounce: wait 1 second after user stops typing
+			const timeoutId = setTimeout(() => {
+				fetchProducts(urlList);
+			}, 1000);
+
+			return () => clearTimeout(timeoutId);
+		}, [productUrls]);
+
+		const fetchProducts = async (urls) => {
+			setIsLoading(true);
+			setFetchError(null);
+
+			try {
+				const response = await apiFetch({
+					path: '/tfmwp/v1/fetch-products',
+					method: 'POST',
+					data: { urls },
+				});
+
+				setAttributes({
+					productsData: response.products,
+					lastFetched: response.lastFetched,
+				});
+			} catch (error) {
+				setFetchError(error.message);
+				console.error('Failed to fetch products:', error);
+			} finally {
+				setIsLoading(false);
+			}
+		};
 
 		const handleRefresh = () => {
-			const currentUrls = productUrls;
-			setAttributes({ productUrls: '' });
-			setTimeout(() => {
-				setAttributes({ productUrls: currentUrls });
-			}, 100);
+			const urlList = productUrls ? productUrls.split('\n').filter(url => url.trim() !== '') : [];
+			if (urlList.length > 0) {
+				fetchProducts(urlList);
+			}
 		};
 
 		// Count URLs
@@ -63,44 +106,85 @@ registerBlockType(metadata.name, {
 					</PanelBody>
 
 					<PanelBody title={__('Cache Control', 'tools-for-makeshop-wp-option')}>
-						<p>{__('Product information is cached for 1 hour. Click the button below to refresh.', 'tools-for-makeshop-wp-option')}</p>
+						<p>{__('Click the button below to refresh product data.', 'tools-for-makeshop-wp-option')}</p>
 						<Button
-							isSecondary
+							variant="secondary"
 							onClick={handleRefresh}
+							disabled={isLoading || urlCount === 0}
 						>
 							{__('Refresh Product Data', 'tools-for-makeshop-wp-option')}
 						</Button>
+						{lastFetched > 0 && (
+							<p style={{ marginTop: '10px', fontSize: '12px', color: '#666' }}>
+								{__('Last updated:', 'tools-for-makeshop-wp-option')} {new Date(lastFetched * 1000).toLocaleString()}
+							</p>
+						)}
 					</PanelBody>
 				</InspectorControls>
 
 				<div {...blockProps}>
 					<div className="tfmwp-product-display-editor">
-						{productUrls ? (
+						{isLoading ? (
+							<div className="tfmwp-loading">
+								<Spinner />
+								<p>{__('Loading products...', 'tools-for-makeshop-wp-option')}</p>
+							</div>
+						) : fetchError ? (
+							<div className="tfmwp-error">
+								<span className="dashicons dashicons-warning"></span>
+								<p>{__('Error loading products:', 'tools-for-makeshop-wp-option')} {fetchError}</p>
+							</div>
+						) : productsData && productsData.length > 0 ? (
 							<div className="tfmwp-product-preview">
 								<div className="tfmwp-preview-header">
 									<span className="dashicons dashicons-products"></span>
 									<strong>{__('makeshop Product Display', 'tools-for-makeshop-wp-option')}</strong>
 								</div>
-								<div className="tfmwp-preview-info">
-									<p>
-										{urlCount === 1
-											? __('1 product will be displayed', 'tools-for-makeshop-wp-option')
-											: `${urlCount} ${__('products will be displayed', 'tools-for-makeshop-wp-option')}`
-										}
-									</p>
-									<p className="tfmwp-preview-grid-info">
-										{__('Grid:', 'tools-for-makeshop-wp-option')}
-										{' '}
-										{__('Desktop', 'tools-for-makeshop-wp-option')}: {columnsDesktop},
-										{' '}
-										{__('Tablet', 'tools-for-makeshop-wp-option')}: {columnsTablet},
-										{' '}
-										{__('Mobile', 'tools-for-makeshop-wp-option')}: {columnsMobile}
-									</p>
-									<p className="tfmwp-preview-note">
-										{__('Products will be fetched and displayed on the frontend.', 'tools-for-makeshop-wp-option')}
-									</p>
+								<div className="tfmwp-product-grid-preview" style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(columnsDesktop, 3)}, 1fr)`, gap: '16px' }}>
+									{productsData.map((product, index) => (
+										<div key={index} className="tfmwp-product-item-preview">
+											{product.error ? (
+												<div className="tfmwp-product-error">
+													<span className="dashicons dashicons-warning"></span>
+													<p>{product.error}</p>
+												</div>
+											) : (
+												<>
+													{product.image && (
+														<div className="tfmwp-product-image">
+															<img src={product.image} alt={product.name} />
+														</div>
+													)}
+													<div className="tfmwp-product-info">
+														{product.category && (
+															<div className="tfmwp-product-category">{product.category}</div>
+														)}
+														{product.name && (
+															<h4 className="tfmwp-product-name">{product.name}</h4>
+														)}
+														{product.price && (
+															<div className="tfmwp-product-price">{product.price}</div>
+														)}
+													</div>
+												</>
+											)}
+										</div>
+									))}
 								</div>
+								<p className="tfmwp-preview-grid-info" style={{ marginTop: '16px', fontSize: '12px', color: '#666' }}>
+									{__('Grid:', 'tools-for-makeshop-wp-option')}
+									{' '}
+									{__('Desktop', 'tools-for-makeshop-wp-option')}: {columnsDesktop},
+									{' '}
+									{__('Tablet', 'tools-for-makeshop-wp-option')}: {columnsTablet},
+									{' '}
+									{__('Mobile', 'tools-for-makeshop-wp-option')}: {columnsMobile}
+								</p>
+							</div>
+						) : productUrls ? (
+							<div className="tfmwp-product-placeholder">
+								<span className="dashicons dashicons-products"></span>
+								<p>{__('Enter valid product URLs to see preview.', 'tools-for-makeshop-wp-option')}</p>
 							</div>
 						) : (
 							<div className="tfmwp-product-placeholder">
