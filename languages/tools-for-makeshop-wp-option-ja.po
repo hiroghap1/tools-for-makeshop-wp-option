@@ -1,0 +1,137 @@
+# Translation for Preview and Tools for makeshop WordPress option
+# Copyright (C) 2026 HASEGAWA Yoshihiro
+# This file is distributed under the same license as the plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: Preview and Tools for makeshop WordPress option 0.0.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-04 00:00+0000\n"
+"PO-Revision-Date: 2026-01-04 00:00+0000\n"
+"Last-Translator: HASEGAWA Yoshihiro\n"
+"Language-Team: Japanese\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Manual\n"
+
+#: tools-for-makeshop-wp-option.php:72
+msgid "makeshop Tools Settings"
+msgstr "makeshopツール設定"
+
+#: tools-for-makeshop-wp-option.php:73
+msgid "makeshop Tools"
+msgstr "makeshopツール"
+
+#: tools-for-makeshop-wp-option.php:96
+msgid "Preview Settings"
+msgstr "プレビュー設定"
+
+#: tools-for-makeshop-wp-option.php:103
+msgid "Enable Preview Feature"
+msgstr "プレビュー機能を有効化"
+
+#: tools-for-makeshop-wp-option.php:136
+msgid "Configure preview settings for WordPress integration option."
+msgstr "WordPress連携オプションのプレビュー設定を構成します。"
+
+#: tools-for-makeshop-wp-option.php:146
+msgid "Block Settings"
+msgstr "ブロック設定"
+
+#: tools-for-makeshop-wp-option.php:153
+msgid "Enable Product Display Block"
+msgstr "商品表示ブロックを有効化"
+
+#: tools-for-makeshop-wp-option.php:178
+msgid "Enable block editor preview and save functionality on WordPress integration option"
+msgstr "WordPress連携オプション上でブロックエディタのプレビューと保存機能を有効にします"
+
+#: tools-for-makeshop-wp-option.php:191
+msgid "Enable makeshop product display block in the block editor"
+msgstr "ブロックエディタでmakeshop商品表示ブロックを有効にします"
+
+#: tools-for-makeshop-wp-option.php:211
+msgid "Save Settings"
+msgstr "設定を保存"
+
+#: blocks/product-display/block.js:10
+msgid "makeshop Product Display"
+msgstr "makeshop商品表示"
+
+#: blocks/product-display/block.js:11
+msgid "Display makeshop products in a grid layout"
+msgstr "makeshop商品をグリッドレイアウトで表示します"
+
+#: blocks/product-display/block.js:14
+msgid "makeshop"
+msgstr "makeshop"
+
+#: blocks/product-display/block.js:15
+msgid "product"
+msgstr "商品"
+
+#: blocks/product-display/block.js:16
+msgid "shop"
+msgstr "ショップ"
+
+#: blocks/product-display/block.js:46
+msgid "Product URLs"
+msgstr "商品URL"
+
+#: blocks/product-display/block.js:48
+msgid "Product URLs (one per line)"
+msgstr "商品URL（1行に1つ）"
+
+#: blocks/product-display/block.js:49
+msgid "Enter makeshop product URLs, one per line"
+msgstr "makeshopの商品URLを1行に1つずつ入力してください"
+
+#: blocks/product-display/block.js:57
+msgid "Grid Settings"
+msgstr "グリッド設定"
+
+#: blocks/product-display/block.js:59
+msgid "Desktop Columns"
+msgstr "デスクトップ列数"
+
+#: blocks/product-display/block.js:67
+msgid "Tablet Columns"
+msgstr "タブレット列数"
+
+#: blocks/product-display/block.js:75
+msgid "Mobile Columns"
+msgstr "モバイル列数"
+
+#: blocks/product-display/block.js:84
+msgid "Cache Control"
+msgstr "キャッシュ制御"
+
+#: blocks/product-display/block.js:85
+msgid "Product information is cached for 1 hour. Click the button below to refresh."
+msgstr "商品情報は1時間キャッシュされます。下のボタンをクリックして更新してください。"
+
+#: blocks/product-display/block.js:89
+msgid "Refresh Product Data"
+msgstr "商品データを更新"
+
+#: blocks/product-display/block.js:100
+msgid "Enter product URLs in the sidebar to display products."
+msgstr "商品を表示するには、サイドバーに商品URLを入力してください。"
+
+#: includes/class-makeshop-scraper.php:30
+msgid "Product URL is required."
+msgstr "商品URLが必要です。"
+
+#: includes/class-makeshop-scraper.php:62
+msgid "Failed to fetch product information."
+msgstr "商品情報の取得に失敗しました。"
+
+#: includes/class-makeshop-scraper.php:141
+msgid "Failed to parse product information from the page."
+msgstr "ページから商品情報の解析に失敗しました。"
+
+#: includes/class-block-product-display.php:114
+msgid "No products found."
+msgstr "商品が見つかりませんでした。"

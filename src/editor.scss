@@ -1,0 +1,26 @@
+/**
+ * Editor styles for Product Display Block
+ */
+
+.tfmwp-product-display-editor {
+	min-height: 100px;
+}
+
+.tfmwp-product-placeholder {
+	padding: 40px 20px;
+	text-align: center;
+	background: #f5f5f5;
+	border: 2px dashed #ccc;
+	border-radius: 8px;
+}
+
+.tfmwp-product-placeholder p {
+	margin: 0;
+	color: #666;
+	font-size: 14px;
+}
+
+/* Apply frontend styles in editor as well */
+.tfmwp-product-display-editor .tfmwp-product-grid {
+	pointer-events: none;
+}

@@ -1,0 +1,40 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "tfmwp/product-display",
+	"title": "makeshop Product Display",
+	"category": "widgets",
+	"icon": "products",
+	"description": "Display makeshop products in a grid layout",
+	"keywords": ["makeshop", "product", "shop"],
+	"textdomain": "tools-for-makeshop-wp-option",
+	"attributes": {
+		"productUrls": {
+			"type": "string",
+			"default": ""
+		},
+		"productsData": {
+			"type": "array",
+			"default": []
+		},
+		"lastFetched": {
+			"type": "number",
+			"default": 0
+		},
+		"columnsDesktop": {
+			"type": "number",
+			"default": 4
+		},
+		"columnsTablet": {
+			"type": "number",
+			"default": 3
+		},
+		"columnsMobile": {
+			"type": "number",
+			"default": 2
+		}
+	},
+	"supports": {
+		"html": false
+	}
+}
