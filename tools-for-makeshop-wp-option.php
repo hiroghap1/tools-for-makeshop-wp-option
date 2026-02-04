@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Preview and Tools for makeshop WordPress option
  * Description: makeshopのWordPress連携オプション用のプレビューとツール
- * Version: 0.0.1
+ * Version: 0.1.0
  * Author: HASEGAWA Yoshihiro
  * Text Domain: tools-for-makeshop-wp-option
  * Domain Path: /languages
@@ -16,6 +16,31 @@
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
+
+/**
+ * Load Composer autoloader for Plugin Update Checker.
+ */
+if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
+	require_once __DIR__ . '/vendor/autoload.php';
+}
+
+/**
+ * Initialize Plugin Update Checker for GitHub updates.
+ */
+use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
+
+add_action( 'init', function() {
+	if ( class_exists( PucFactory::class ) ) {
+		$update_checker = PucFactory::buildUpdateChecker(
+			'https://github.com/hiroghap1/tools-for-makeshop-wp-option',
+			__FILE__,
+			'tools-for-makeshop-wp-option'
+		);
+
+		// リリースアセット（zipファイル）を使用する場合
+		$update_checker->getVcsApi()->enableReleaseAssets();
+	}
+});
 
 /**
  * Currently plugin version.

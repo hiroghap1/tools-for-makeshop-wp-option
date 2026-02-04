@@ -1,0 +1,68 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          tools: composer:v2
+
+      - name: Install Node.js dependencies
+        run: npm install
+
+      - name: Build assets
+        run: npm run build
+
+      - name: Install Composer dependencies (production)
+        run: composer install --no-dev --optimize-autoloader
+
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Create release directory
+        run: |
+          mkdir -p release/tools-for-makeshop-wp-option
+          
+          # Copy necessary files
+          cp -r build release/tools-for-makeshop-wp-option/
+          cp -r includes release/tools-for-makeshop-wp-option/
+          cp -r languages release/tools-for-makeshop-wp-option/
+          cp -r vendor release/tools-for-makeshop-wp-option/
+          cp tools-for-makeshop-wp-option.php release/tools-for-makeshop-wp-option/
+          cp readme.txt release/tools-for-makeshop-wp-option/
+          cp README.md release/tools-for-makeshop-wp-option/
+          cp composer.json release/tools-for-makeshop-wp-option/
+
+      - name: Create zip file
+        run: |
+          cd release
+          zip -r ../tools-for-makeshop-wp-option-${{ steps.get_version.outputs.VERSION }}.zip tools-for-makeshop-wp-option
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: tools-for-makeshop-wp-option-${{ steps.get_version.outputs.VERSION }}.zip
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

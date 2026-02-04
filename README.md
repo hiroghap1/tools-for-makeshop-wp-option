@@ -64,7 +64,7 @@ Preview and Tools for makeshop WordPress optionは、[makeshop](https://www.make
 
 ```bash
 cd /path/to/wordpress/wp-content/plugins/
-git clone https://github.com/yourusername/tools-for-makeshop-wp-option.git
+git clone https://github.com/hiroghap1/tools-for-makeshop-wp-option.git
 cd tools-for-makeshop-wp-option
 npm install
 npm run build
@@ -225,7 +225,7 @@ A: デフォルトでは1時間ごとに自動更新されます。また、ブ�
 
 ## サポート
 
-バグ報告や機能リクエストは、[GitHubのIssueページ](https://github.com/yourusername/tools-for-makeshop-wp-option/issues)でお願いします。
+バグ報告や機能リクエストは、[GitHubのIssueページ](https://github.com/hiroghap1/tools-for-makeshop-wp-option/issues)でお願いします。
 
 ## 貢献
 

@@ -1,0 +1,20 @@
+{
+	"name": "hasegawa/tools-for-makeshop-wp-option",
+	"description": "Preview and Tools for makeshop WordPress option",
+	"type": "wordpress-plugin",
+	"license": "GPL-2.0-or-later",
+	"require": {
+		"php": ">=7.4",
+		"yahnis-elsts/plugin-update-checker": "^5.4"
+	},
+	"config": {
+		"allow-plugins": {
+			"composer/installers": true
+		}
+	},
+	"autoload": {
+		"classmap": [
+			"includes/"
+		]
+	}
+}
