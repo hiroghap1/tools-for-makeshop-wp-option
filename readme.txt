@@ -4,7 +4,7 @@ Tags: makeshop, ecommerce, product-display, gutenberg, block
 Requires at least: 5.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 0.0.1
+Stable tag: 0.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -114,6 +114,9 @@ makeshopは、GMOメイクショップ株式会社が提供するECサイト構�
 
 == Changelog ==
 
+= 0.1.0 =
+* GitHubリリースからのプラグイン自動更新機能を追加
+
 = 0.0.1 =
 * 初回リリース
 * ブロックエディタプレビュー・保存機能
@@ -126,6 +129,9 @@ makeshopは、GMOメイクショップ株式会社が提供するECサイト構�
 * 日本語完全対応
 
 == Upgrade Notice ==
+
+= 0.1.0 =
+プラグインの自動更新機能を追加しました。
 
 = 0.0.1 =
 初回リリースです。

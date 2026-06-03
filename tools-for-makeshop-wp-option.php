@@ -45,7 +45,7 @@ add_action( 'init', function() {
 /**
  * Currently plugin version.
  */
-define( 'TFMWP_VERSION', '0.0.1' );
+define( 'TFMWP_VERSION', '0.1.0' );
 
 /**
  * Plugin base path.
