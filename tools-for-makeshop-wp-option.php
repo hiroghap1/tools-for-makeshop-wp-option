@@ -103,6 +103,10 @@ function tfmwp_init() {
 	if ( tfmwp_is_preview_enabled() ) {
 		add_filter( 'preview_post_link', 'tfmwp_replace_preview_post_link' );
 		add_filter( 'rest_url', 'tfmwp_replace_rest_url' );
+		// Make internal post oEmbed previews work behind the reverse proxy.
+		add_filter( 'oembed_request_post_id', 'tfmwp_resolve_oembed_post_id', 10, 2 );
+		add_filter( 'rest_request_after_callbacks', 'tfmwp_rewrite_oembed_proxy_response', 10, 3 );
+		add_filter( 'embed_oembed_html', 'tfmwp_rewrite_embed_html_for_current_host', 10, 1 );
 	}
 
 	// Initialize product display block if enabled
@@ -683,4 +687,156 @@ function tfmwp_replace_rest_url( $url ) {
 		$url = str_replace( home_url(), site_url(), $url );
 	}
 	return $url;
+}
+
+/**
+ * Resolve the post ID for an oEmbed request behind a reverse proxy.
+ *
+ * In reverse-proxied makeshop environments, home_url() (the public address)
+ * and site_url() (the address the admin/server can reach) differ. When an
+ * editor pastes a WordPress article URL, WordPress tries to match it to a
+ * local post with url_to_postid(). If the pasted URL's host does not match
+ * home_url() exactly, the match fails and WordPress falls back to a remote
+ * loopback request to the public URL, which is typically unreachable from the
+ * server in these environments, so the embed preview never appears.
+ *
+ * This filter retries url_to_postid() with the host swapped between home_url()
+ * and site_url() so the URL resolves to a local post. Once resolved, WordPress
+ * returns the oEmbed data directly and skips the failing loopback request.
+ *
+ * @param int    $post_id The post ID resolved from the URL, or 0 if not found.
+ * @param string $url     The URL to resolve.
+ * @return int The resolved post ID.
+ */
+function tfmwp_resolve_oembed_post_id( $post_id, $url ) {
+	// Already resolved by WordPress; nothing to do.
+	if ( $post_id ) {
+		return $post_id;
+	}
+
+	$home = home_url();
+	$site = site_url();
+
+	$candidates = array();
+
+	// Swap the full base URL in both directions (covers scheme + host + path).
+	if ( $home !== $site ) {
+		$candidates[] = str_replace( $home, $site, $url );
+		$candidates[] = str_replace( $site, $home, $url );
+	}
+
+	// Swap host only, to tolerate scheme-only or host-only proxy differences.
+	$home_host = wp_parse_url( $home, PHP_URL_HOST );
+	$site_host = wp_parse_url( $site, PHP_URL_HOST );
+	$url_host  = wp_parse_url( $url, PHP_URL_HOST );
+
+	if ( $home_host && $site_host && $url_host && $home_host !== $site_host ) {
+		if ( $url_host === $site_host ) {
+			$candidates[] = preg_replace( '#//' . preg_quote( $site_host, '#' ) . '#', '//' . $home_host, $url, 1 );
+		} elseif ( $url_host === $home_host ) {
+			$candidates[] = preg_replace( '#//' . preg_quote( $home_host, '#' ) . '#', '//' . $site_host, $url, 1 );
+		}
+	}
+
+	foreach ( array_unique( $candidates ) as $candidate ) {
+		if ( empty( $candidate ) || $candidate === $url ) {
+			continue;
+		}
+
+		$resolved = url_to_postid( $candidate );
+		if ( $resolved ) {
+			return $resolved;
+		}
+	}
+
+	return $post_id;
+}
+
+/**
+ * Rewrite the oEmbed proxy response so the editor's browser can reach the preview.
+ *
+ * The oEmbed proxy endpoint (/oembed/1.0/proxy) is the route the block editor
+ * uses to render the embed preview. Behind a reverse proxy, the embed HTML it
+ * returns contains an iframe pointing at home_url() (the public address), which
+ * the editor's browser cannot reach. WordPress also caches proxy responses in a
+ * transient for 24 hours, so we rewrite at the response stage (after callbacks)
+ * to ensure both fresh and cached responses get the reachable host.
+ *
+ * This is scoped to the proxy route only, so the public front-end embed output
+ * (which must keep the public home_url()) is left untouched.
+ *
+ * @param WP_REST_Response|WP_HTTP_Response|WP_Error|mixed $response Result to send to the client.
+ * @param array                                            $handler  Route handler used for the request.
+ * @param WP_REST_Request                                  $request  Request used to generate the response.
+ * @return mixed The response with the preview HTML host rewritten.
+ */
+function tfmwp_rewrite_oembed_proxy_response( $response, $handler, $request ) {
+	if ( ! is_object( $request ) || 0 !== strpos( $request->get_route(), '/oembed/1.0/proxy' ) ) {
+		return $response;
+	}
+
+	if ( is_wp_error( $response ) ) {
+		return $response;
+	}
+
+	$is_rest_response = ( $response instanceof WP_REST_Response );
+	$data             = $is_rest_response ? $response->get_data() : $response;
+
+	$home = home_url();
+	$site = site_url();
+
+	if ( $home !== $site ) {
+		if ( is_object( $data ) && ! empty( $data->html ) ) {
+			$data->html = str_replace( $home, $site, $data->html );
+		} elseif ( is_array( $data ) && ! empty( $data['html'] ) ) {
+			$data['html'] = str_replace( $home, $site, $data['html'] );
+		}
+	}
+
+	if ( $is_rest_response ) {
+		$response->set_data( $data );
+		return $response;
+	}
+
+	return $data;
+}
+
+/**
+ * Rewrite front-end embed HTML so it works when viewed via the site_url host.
+ *
+ * On the public host (home_url, e.g. the makeshop storefront domain) the embed
+ * iframe must keep pointing at the public address so visitors can reach it. But
+ * when the same page is viewed through the WordPress address (site_url, e.g. the
+ * hosting domain) — typically a post preview or staging access — the iframe's
+ * home_url() host is unreachable from that browser context and the embed breaks.
+ *
+ * This swaps home_url() for site_url() in the embed HTML only when the current
+ * request is being served from the site_url host, leaving public output intact.
+ *
+ * @param string $html The cached oEmbed HTML.
+ * @return string The embed HTML, with its host rewritten when viewed via site_url.
+ */
+function tfmwp_rewrite_embed_html_for_current_host( $html ) {
+	if ( empty( $html ) ) {
+		return $html;
+	}
+
+	$home = home_url();
+	$site = site_url();
+	if ( $home === $site ) {
+		return $html;
+	}
+
+	$home_host = wp_parse_url( $home, PHP_URL_HOST );
+	$site_host = wp_parse_url( $site, PHP_URL_HOST );
+
+	$current_host = isset( $_SERVER['HTTP_HOST'] ) ? wp_unslash( $_SERVER['HTTP_HOST'] ) : '';
+	$current_host = preg_replace( '/:\d+$/', '', $current_host ); // Strip any port.
+
+	// Only rewrite when the page is served from the site_url host (preview/staging).
+	if ( $current_host && $site_host && $current_host === $site_host && $current_host !== $home_host ) {
+		$html = str_replace( $home, $site, $html );
+	}
+
+	return $html;
 }
